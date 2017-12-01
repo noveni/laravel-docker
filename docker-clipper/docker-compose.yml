@@ -2,7 +2,7 @@ version: '3'
 
 services:
   httpd:
-    container_name: "${DOCKER_CONTAINER_NAME_PREFIX}_httpd_1"
+    container_name: "${DOCKER_CONTAINER_PREFIX}_httpd_1"
     image: httpd:2.4.25
     environment:
       - APACHE_LOG_DIR=/usr/local/apache2/logs
@@ -11,22 +11,22 @@ services:
       - "${HTTP_PORT}:80"
       - "${HTTPS_PORT}:443"
     volumes:
-      - ./docker-config/httpd/httpd.conf:/usr/local/apache2/conf/httpd.conf
-      - ./docker-config/httpd/vhosts/:/usr/local/apache2/conf/vhosts
-      - ./www:/var/www
-      - ./docker-config/httpd/server.crt:/usr/local/apache2/conf/server.crt
-      - ./docker-config/httpd/server.key:/usr/local/apache2/conf/server.key
+      - ${DOCKER_STACK_DIR}/httpd/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ${DOCKER_STACK_DIR}/httpd/vhosts/:/usr/local/apache2/conf/vhosts
+      - ${DOCKER_STACK_DIR}/httpd/server.crt:/usr/local/apache2/conf/server.crt
+      - ${DOCKER_STACK_DIR}/httpd/server.key:/usr/local/apache2/conf/server.key
+      - ${ROOT_DIR}/www:/var/www
     links:
       - php
     depends_on:
       - php
 
   php:
-    container_name: "${DOCKER_CONTAINER_NAME_PREFIX}_php_1"
-    build: ./docker-config/php
+    container_name: "${DOCKER_CONTAINER_PREFIX}_php_1"
+    build: ${DOCKER_STACK_DIR}/php
     restart: always
     volumes:
-      - ./www:/var/www
+      - ${ROOT_DIR}/www:/var/www
     links:
       - db
     environment:
@@ -39,11 +39,11 @@ services:
       - db
 
   db:
-    container_name: "${DOCKER_CONTAINER_NAME_PREFIX}_mysql_1"
+    container_name: "${DOCKER_CONTAINER_PREFIX}_mysql_1"
     restart: always
     image: mysql:5.5
     volumes:
-      - ./docker-config/mysql:/etc/mysql/conf.d
+      - ${DOCKER_STACK_DIR}/mysql:/etc/mysql/conf.d
       - dbdata:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -52,7 +52,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   phpmyadmin:
-    container_name: "${DOCKER_CONTAINER_NAME_PREFIX}_phpmyadmin_1"
+    container_name: "${DOCKER_CONTAINER_PREFIX}_phpmyadmin_1"
     image: phpmyadmin/phpmyadmin
     restart: always
     environment:
@@ -63,6 +63,12 @@ services:
       - db
     depends_on:
       - db
+
+  node:
+    container_name: "${DOCKER_CONTAINER_PREFIX}_node_1"
+    build: ${DOCKER_STACK_DIR}/node
+    volumes:
+    - ${ROOT_DIR}/www:/var/www
 
 volumes:
   dbdata:
