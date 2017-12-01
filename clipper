@@ -48,7 +48,7 @@ if [ $# -gt 0 ]; then
         composer)
             shift 1
             echo "composer $@"
-            $DOCKERCOMPOSE exec php composer "$@"
+            $DOCKERCOMPOSE exec php bash | composer "$@"
         ;;
         bash)
             echo "exposing bash of php container"
