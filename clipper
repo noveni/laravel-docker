@@ -9,7 +9,7 @@ export ROOT_DIR=$DIR
 
 # Get IP address - only on OSX
 IP=$(ipconfig getifaddr en0) #ethernet
-if [ -z $IP]; then
+if [ -z $IP ]; then
     IP=$(ipconfig getifaddr en1) #wifi
 fi
 
